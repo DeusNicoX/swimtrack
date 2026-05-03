@@ -1,0 +1,19 @@
+{
+  "name": "swimtrack",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Prototipo academico para conectar entrenadores de natacion con usuarios.",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace frontend",
+    "dev:backend": "npm run dev --workspace backend",
+    "lint": "npm run lint --workspaces",
+    "format": "npm run format --workspaces"
+  },
+  "devDependencies": {
+    "@openai/codex": "^0.128.0"
+  }
+}
