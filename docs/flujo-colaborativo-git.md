@@ -45,3 +45,7 @@ y el uso del control de versiones en un entorno colaborativo.
 ## Resultado esperado
 Al finalizar, la rama main debe contener los documentos creados por ambos
 integrantes y un historial que permita verificar la aplicacion de Git y GitHub.
+
+## Nota de evidencia
+
+Documento revisado y validado por Josberth Anibal Patiño como parte del proceso de grabacion de evidencia academica.

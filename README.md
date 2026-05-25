@@ -89,3 +89,14 @@ Si la conexion esta correcta, la API responde con un usuario, un `token` JWT y e
 npm run lint
 npm run format
 ```
+## Documentacion academica - Actividad 4
+
+La documentacion relacionada con el ejercicio de versionamiento colaborativo
+puede consultarse en los siguientes archivos:
+
+- [Historias de usuario](docs/historias-de-usuario.md)
+- [Flujo colaborativo con Git y GitHub](docs/flujo-colaborativo-git.md)
+
+**Integrantes:**
+- Josberth Anibal Patiño
+- Nicolas Saenz Bello
