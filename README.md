@@ -424,10 +424,16 @@ npx playwright install chromium
 npm run lint --workspaces
 npm run build
 npm run test
-npm run test:integration
 npm run test:coverage
+docker compose up -d swimtrack-postgres
+npm run db:schema --workspace backend
+npm run test:integration
 npm run test:e2e:docker
 ```
+
+`npm run test` y `npm run test:coverage` ejecutan pruebas unitarias. Las
+pruebas de integracion se ejecutan despues de levantar PostgreSQL y aplicar el
+schema.
 
 El script `test:e2e:docker` construye y levanta el stack Docker completo antes
 de ejecutar Playwright contra `http://localhost:8080`.

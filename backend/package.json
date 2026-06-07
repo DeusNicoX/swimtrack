@@ -8,9 +8,9 @@
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "lint": "eslint .",
-    "test": "vitest run",
+    "test": "vitest run test/unit",
     "test:unit": "vitest run test/unit",
-    "test:coverage": "vitest run --coverage",
+    "test:coverage": "vitest run test/unit --coverage",
     "test:integration": "vitest run test/integration",
     "format": "prettier --write ."
   },

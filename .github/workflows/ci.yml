@@ -13,6 +13,10 @@ jobs:
     name: Lint, build and test
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      DATABASE_URL: postgres://swimtrack:swimtrack@localhost:5433/swimtrack
+      JWT_SECRET: ci-test-secret
+      JWT_EXPIRES_IN: 1h
 
     steps:
       - name: Checkout repository
@@ -42,11 +46,17 @@ jobs:
       - name: Run unit tests
         run: npm run test
 
-      - name: Run integration tests
-        run: npm run test:integration
-
       - name: Run coverage
         run: npm run test:coverage
+
+      - name: Start PostgreSQL for integration tests
+        run: docker compose up -d swimtrack-postgres
+
+      - name: Apply database schema
+        run: npm run db:schema --workspace backend
+
+      - name: Run integration tests
+        run: npm run test:integration
 
       - name: Run Docker E2E tests
         run: npm run test:e2e:docker
