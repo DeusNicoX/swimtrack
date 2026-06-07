@@ -52,8 +52,37 @@ jobs:
       - name: Start PostgreSQL for integration tests
         run: docker compose up -d swimtrack-postgres
 
+      - name: Wait for PostgreSQL readiness
+        run: |
+          for attempt in {1..60}; do
+            if docker compose exec -T swimtrack-postgres pg_isready -U swimtrack -d swimtrack; then
+              echo "PostgreSQL is ready"
+              exit 0
+            fi
+
+            echo "Waiting for PostgreSQL... attempt ${attempt}/60"
+            sleep 1
+          done
+
+          echo "PostgreSQL did not become ready within 60 seconds"
+          docker compose ps
+          docker compose logs swimtrack-postgres --tail=100
+          exit 1
+
+      - name: Show PostgreSQL diagnostics
+        run: |
+          docker compose ps
+          docker compose logs swimtrack-postgres --tail=100
+
       - name: Apply database schema
-        run: npm run db:schema --workspace backend
+        env:
+          DATABASE_URL: postgres://swimtrack:swimtrack@localhost:5433/swimtrack
+        run: |
+          npm run db:schema --workspace backend || {
+            echo "Database schema failed. PostgreSQL logs:"
+            docker compose logs swimtrack-postgres --tail=100
+            exit 1
+          }
 
       - name: Run integration tests
         run: npm run test:integration
