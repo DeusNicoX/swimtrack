@@ -1,11 +1,6 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 5173,
-  },
   test: {
     coverage: {
       exclude: [
@@ -14,14 +9,14 @@ export default defineConfig({
         'coverage/**',
         '*.config.js',
         'eslint.config.js',
-        'vite.config.js',
-        'src/main.jsx',
+        'vitest.config.js',
+        'src/config/**',
+        'src/server.js',
       ],
       provider: 'v8',
       reporter: ['text', 'html'],
     },
-    environment: 'jsdom',
+    environment: 'node',
     globals: true,
-    setupFiles: './src/test/setup.js',
   },
 });

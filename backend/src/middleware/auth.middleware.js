@@ -1,6 +1,15 @@
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
 
+/**
+ * Express middleware that validates a Bearer JWT and attaches the decoded
+ * claims to req.user for downstream route handlers.
+ *
+ * @param {import('express').Request & {user?: object}} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ * @returns {void|import('express').Response}
+ */
 export function requireAuth(req, res, next) {
   const authorizationHeader = req.get('authorization');
 

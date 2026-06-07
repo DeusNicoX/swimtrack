@@ -3,6 +3,12 @@ import { env } from './env.js';
 
 const { Pool } = pg;
 
+/**
+ * Shared PostgreSQL connection pool.
+ *
+ * Uses DATABASE_URL when available, otherwise falls back to individual PG*
+ * environment variables.
+ */
 export const pool = new Pool(
   env.databaseUrl
     ? {

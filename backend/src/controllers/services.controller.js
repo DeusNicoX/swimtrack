@@ -1,5 +1,11 @@
 import { pool } from '../config/db.js';
 
+/**
+ * Maps a service row joined with trainer data to the API response shape.
+ *
+ * @param {object} row Database row from the services/users join.
+ * @returns {object} Public service representation.
+ */
 function mapService(row) {
   return {
     coach: {
@@ -17,6 +23,12 @@ function mapService(row) {
   };
 }
 
+/**
+ * Validates the service creation payload.
+ *
+ * @param {object} payload Incoming Express request body.
+ * @returns {string|null} Human-readable validation error or null.
+ */
 function validateServicePayload(payload) {
   const { description, location, modality, schedule, title } = payload;
 
@@ -27,6 +39,16 @@ function validateServicePayload(payload) {
   return null;
 }
 
+/**
+ * Handles GET /api/services.
+ *
+ * Returns all published services ordered by creation date, including basic
+ * trainer information for each service.
+ *
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @returns {Promise<import('express').Response>}
+ */
 export async function listServices(req, res) {
   const servicesResult = await pool.query(
     `SELECT
@@ -50,6 +72,15 @@ export async function listServices(req, res) {
   });
 }
 
+/**
+ * Handles POST /api/services.
+ *
+ * Requires an authenticated trainer and persists a new service publication.
+ *
+ * @param {import('express').Request & {user?: {role: string, sub: string}}} req
+ * @param {import('express').Response} res
+ * @returns {Promise<import('express').Response>}
+ */
 export async function createService(req, res) {
   if (req.user.role !== 'trainer') {
     return res.status(403).json({

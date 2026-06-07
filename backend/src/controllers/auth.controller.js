@@ -6,6 +6,12 @@ import { env } from '../config/env.js';
 const allowedRoles = ['client', 'trainer'];
 const passwordSaltRounds = 10;
 
+/**
+ * Builds the JWT payload used by protected API routes.
+ *
+ * @param {{id: number|string, email: string, role: string}} user
+ * @returns {string} Signed JWT with subject, email and role claims.
+ */
 function createToken(user) {
   return jwt.sign(
     {
@@ -18,6 +24,12 @@ function createToken(user) {
   );
 }
 
+/**
+ * Removes sensitive database fields before returning user data to clients.
+ *
+ * @param {{id: number, full_name: string, email: string, role: string}} row
+ * @returns {{id: number, full_name: string, email: string, role: string}}
+ */
 function mapUser(row) {
   return {
     email: row.email,
@@ -27,6 +39,12 @@ function mapUser(row) {
   };
 }
 
+/**
+ * Validates the registration payload for both clients and trainers.
+ *
+ * @param {object} payload Incoming Express request body.
+ * @returns {string|null} Human-readable validation error or null.
+ */
 function validateRegisterPayload(payload) {
   const {
     email,
@@ -56,6 +74,16 @@ function validateRegisterPayload(payload) {
   return null;
 }
 
+/**
+ * Handles POST /api/auth/register.
+ *
+ * Creates the user inside a transaction, optionally creates a trainer profile,
+ * and returns the sanitized user plus JWT.
+ *
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @returns {Promise<import('express').Response>}
+ */
 export async function register(req, res) {
   const validationError = validateRegisterPayload(req.body);
 
@@ -125,6 +153,16 @@ export async function register(req, res) {
   }
 }
 
+/**
+ * Handles POST /api/auth/login.
+ *
+ * Validates credentials against the stored password hash and returns a JWT
+ * for authenticated API calls.
+ *
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @returns {Promise<import('express').Response>}
+ */
 export async function login(req, res) {
   const { email, password } = req.body;
 

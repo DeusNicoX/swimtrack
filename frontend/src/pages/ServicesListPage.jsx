@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { API_BASE_URL } from '../config/api.js';
+import { filterServices, mapApiService } from '../utils/services.js';
 
 const filterOptions = [
   'Natacion tecnica',
@@ -9,31 +10,6 @@ const filterOptions = [
   'Individual',
   'Mananas',
 ];
-
-function getInitials(name = '') {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join('')
-    .toUpperCase();
-}
-
-function mapApiService(service) {
-  const coachName = service.coach?.full_name || 'Entrenador SwimTrack';
-
-  return {
-    category: service.modality,
-    coach: coachName,
-    id: service.id,
-    initials: getInitials(coachName),
-    location: service.location,
-    schedule: service.schedule,
-    serviceName: service.title,
-    type: service.title,
-  };
-}
 
 function ServicesListPage({ onLogout, session }) {
   const [services, setServices] = useState([]);
@@ -79,42 +55,10 @@ function ServicesListPage({ onLogout, session }) {
     };
   }, []);
 
-  const visibleServices = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase();
-
-    return services.filter((service) => {
-      const textSearchableFields = [
-        service.serviceName,
-        service.type,
-        service.coach,
-        service.location,
-      ]
-        .join(' ')
-        .toLowerCase();
-
-      const filterSearchableFields = [
-        service.serviceName,
-        service.type,
-        service.category,
-        service.schedule,
-        service.coach,
-      ]
-        .join(' ')
-        .toLowerCase();
-
-      const matchesSearch =
-        normalizedSearch === '' ||
-        textSearchableFields.includes(normalizedSearch);
-
-      const matchesFilters =
-        selectedFilters.length === 0 ||
-        selectedFilters.some((filter) =>
-          filterSearchableFields.includes(filter.toLowerCase()),
-        );
-
-      return matchesSearch && matchesFilters;
-    });
-  }, [searchTerm, selectedFilters, services]);
+  const visibleServices = useMemo(
+    () => filterServices(services, searchTerm, selectedFilters),
+    [searchTerm, selectedFilters, services],
+  );
 
   const resultsLabel =
     visibleServices.length === 1

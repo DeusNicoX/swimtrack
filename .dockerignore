@@ -1,0 +1,14 @@
+node_modules
+*/node_modules
+dist
+*/dist
+coverage
+*/coverage
+playwright-report
+test-results
+.npm-cache
+.git
+.gitignore
+.env
+*.log
+.DS_Store
