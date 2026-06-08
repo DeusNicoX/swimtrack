@@ -53,6 +53,17 @@ describe.sequential('SwimTrack API integration', () => {
     expect(response.body).toEqual({ message: 'SwimTrack API' });
   });
 
+  it('responds with health status and environment', async () => {
+    const response = await request(app).get('/api/health');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      environment: expect.any(String),
+      status: 'ok',
+      timestamp: expect.any(String),
+    });
+  });
+
   it('registers a client user successfully', async () => {
     const email = `client-register-${runId}@test.com`;
 

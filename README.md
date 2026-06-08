@@ -107,10 +107,17 @@ PORT=3000
 DATABASE_URL=postgres://swimtrack:swimtrack@localhost:5433/swimtrack
 JWT_SECRET=change_me_in_local_env
 JWT_EXPIRES_IN=1h
-CORS_ORIGIN=http://localhost:5173
+CORS_ORIGIN=http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080
+NODE_ENV=development
 ```
 
-El frontend puede usar:
+El frontend lee variables desde `frontend/.env`. Archivo base:
+
+```bash
+cp frontend/.env.example frontend/.env
+```
+
+Variable principal:
 
 ```env
 VITE_API_BASE_URL=http://localhost:3000
@@ -450,18 +457,128 @@ No hay despliegue configurado en este workflow.
 
 ## Despliegue
 
-Preparado a nivel de aplicacion:
+SwimTrack esta preparado para desplegar:
 
-- Frontend genera build estatico con Vite.
-- Backend expone API Express por `PORT`.
-- Conexion a base por `DATABASE_URL`.
+- Frontend en Vercel.
+- Backend en Render.
+- PostgreSQL en Neon.
 
-Pendiente:
+No se deben commitear secretos reales. Configura las credenciales solo en los
+paneles de cada plataforma.
 
-- Elegir plataforma de despliegue.
-- Configurar variables de entorno seguras.
-- Crear Dockerfiles o configuracion especifica para la plataforma.
-- Definir dominio, CORS de produccion y estrategia de migraciones.
+### 1. Base de datos en Neon PostgreSQL
+
+1. Crea un proyecto en Neon.
+2. Crea una base de datos para SwimTrack.
+3. Copia la connection string de Neon.
+4. En local o desde un entorno seguro, aplica el schema apuntando a Neon:
+
+```bash
+DATABASE_URL="postgresql://USER:PASSWORD@HOST.neon.tech/DB?sslmode=require" \
+npm run db:schema --workspace backend
+```
+
+No pegues la URL real en archivos del repositorio.
+
+### 2. Backend en Render
+
+Crear un Web Service en Render conectado al repositorio de GitHub.
+
+Configuracion recomendada:
+
+| Campo | Valor |
+|---|---|
+| Runtime | Node |
+| Root Directory | raiz del repo |
+| Build Command | `npm ci --omit=dev --workspace backend` |
+| Start Command | `npm run start --workspace backend` |
+
+Variables de entorno en Render:
+
+```env
+NODE_ENV=production
+PORT=3000
+DATABASE_URL=postgresql://USER:PASSWORD@HOST.neon.tech/DB?sslmode=require
+JWT_SECRET=generate_a_secure_random_secret
+JWT_EXPIRES_IN=1h
+CORS_ORIGIN=https://your-vercel-app.vercel.app
+```
+
+Validaciones post-deploy del backend:
+
+```text
+https://your-render-service.onrender.com/api/health
+https://your-render-service.onrender.com/api/docs/
+https://your-render-service.onrender.com/api/services
+```
+
+`/api/health` debe responder:
+
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-06-07T00:00:00.000Z",
+  "environment": "production"
+}
+```
+
+### 3. Frontend en Vercel
+
+Crear un proyecto en Vercel conectado al mismo repositorio.
+
+Configuracion recomendada:
+
+| Campo | Valor |
+|---|---|
+| Framework Preset | Vite |
+| Root Directory | raiz del repo |
+| Install Command | `npm ci` |
+| Build Command | `npm run build --workspace frontend` |
+| Output Directory | `frontend/dist` |
+
+Variable de entorno en Vercel:
+
+```env
+VITE_API_BASE_URL=https://your-render-service.onrender.com
+```
+
+Despues de configurar el dominio final de Vercel, actualiza en Render:
+
+```env
+CORS_ORIGIN=https://your-vercel-app.vercel.app
+```
+
+Si necesitas permitir varios origenes temporales:
+
+```env
+CORS_ORIGIN=https://your-vercel-app.vercel.app,https://your-preview.vercel.app
+```
+
+Validaciones post-deploy del frontend:
+
+- Abrir `https://your-vercel-app.vercel.app`.
+- Registrar un usuario `client` y confirmar redireccion a `/servicios`.
+- Registrar o iniciar sesion como `trainer` y publicar un servicio.
+- Confirmar que el servicio aparece en el listado.
+
+### Variables finales de produccion
+
+Backend Render:
+
+```env
+NODE_ENV=production
+PORT=3000
+DATABASE_URL=
+JWT_SECRET=
+JWT_EXPIRES_IN=1h
+CORS_ORIGIN=
+```
+
+Frontend Vercel:
+
+```env
+VITE_API_BASE_URL=
+```
 
 ## Documentacion academica
 

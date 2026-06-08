@@ -16,6 +16,14 @@ app.get('/', (req, res) => {
   res.json({ message: 'SwimTrack API' });
 });
 
+app.get('/api/health', (req, res) => {
+  res.json({
+    environment: env.nodeEnv,
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/services', servicesRoutes);
 

@@ -16,6 +16,7 @@ export const env = {
   databaseUrl: process.env.DATABASE_URL,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1h',
   jwtSecret: process.env.JWT_SECRET || 'swimtrack-dev-secret',
+  nodeEnv: process.env.NODE_ENV || 'development',
   pgDatabase: process.env.PGDATABASE,
   pgHost: process.env.PGHOST,
   pgPassword: process.env.PGPASSWORD,
